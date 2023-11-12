@@ -27,11 +27,11 @@ class ImageComposer:
     # alpha render
     screen = Image.alpha_composite(screen, box)
     # person
-    ay = by = 800
+    ay = by = 750
     if name == "A":
       ay = 720
     else:
       by = 720
-    screen.paste(self.p_a_file.resize((200,200)), (40, ay))
-    screen.paste(self.p_b_file.resize((200,200)), (1680, by))
+    screen.paste(self.p_a_file.resize((250,250)), (40, ay))
+    screen.paste(self.p_b_file.resize((250,250)), (1630, by))
     return screen

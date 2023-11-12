@@ -25,26 +25,33 @@ class Explanation:
         with open(self.config_dir + "/image_person_b.txt", "r", encoding="utf-8") as f:
             self.image_text_b = f.read()
 
-    def generate(self, question):
-        print("generate talk scenario...")
-        talks = self._generate_talks(question)
-        print("generate speech files...")
-        self._generate_speech(talks)
-        print("generate background image files...")
-        self._generate_image(self.image_text_bg, BG_IMAGE)
-        print("generate person A image files...")
-        self._generate_image(self.image_text_a, PERSON_A_IMAGE)
-        print("generate person B image files...")
-        self._generate_image(self.image_text_b, PERSON_B_IMAGE)
+    def generate(self, question, image_only=False, keep_image=False):
+        # 画像の生成
+        if not keep_image:
+            print("generate background image files...")
+            self._generate_image(self.image_text_bg, BG_IMAGE)
+            print("generate person A image files...")
+            self._generate_image(self.image_text_a, PERSON_A_IMAGE)
+            print("generate person B image files...")
+            self._generate_image(self.image_text_b, PERSON_B_IMAGE)
+        # 解説動画の生成
+        if not image_only:
+            print("generate talk scenario...")
+            talks = self._generate_talks(question)
+            print("generate speech files...")
+            self._generate_speech(talks)
+            #
+            print("generate pages...")
+            ic = ImageComposer(BG_IMAGE, PERSON_A_IMAGE, PERSON_B_IMAGE, self.font)
+            mc = MovieClip()
+            for i, talk in enumerate(talks):
+                print(f"({i+1}/{len(talks)})...")
+                image = ic.compose(talk).save(f"output/page_{i}.png")
+                mc.add(f"output/page_{i}.png", f"output/speech_{i}.mp3")
+            print("output movie file...")
+            mc.save("output/kaisetsu_movie.mp4")
         #
-        ic = ImageComposer(BG_IMAGE, PERSON_A_IMAGE, PERSON_B_IMAGE, self.font)
-        mc = MovieClip()
-        for i, talk in enumerate(talks):
-            print(f"({i+1}/{len(talks)})...")
-            image = ic.compose(talk).save(f"output/page_{i}.png")
-            mc.add(f"output/page_{i}.png", f"output/speech_{i}.mp3")
-        print("output movie file...")
-        mc.save("output/output.mp4")
+        print("done.")
     
     # ゆっくり解説風掛け合いの生成
     def _generate_talks(self, question):
