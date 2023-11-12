@@ -8,6 +8,8 @@
 - Dall-E3 : 背景とキャラクター2人の顔絵を生成
 - Speech TTS : キャラクターの音声読み上げ
 
+[![出力サンプル動画](http://img.youtube.com/vi/3dwVO4v5III/0.jpg)](http://www.youtube.com/watch?v=3dwVO4v5III "出力サンプル動画")
+
 以下の手順に従って環境をセットアップし、プロジェクトを開始してください。
 
 ## 環境のセットアップ
