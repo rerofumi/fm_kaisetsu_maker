@@ -5,13 +5,15 @@ BG_IMAGE = "background.png"
 PERSON_A_IMAGE = "person_a.png"
 PERSON_B_IMAGE = "person_b.png"
 FONT_FILE = "NotoSansJP-Medium.ttf"
+PERSON_A_TALKER = "alloy"
+PERSON_B_TALKER = "nova"
 
 class Explanation:
     def __init__(self, api, config_dir, output_dir):
         self.api = api
         self.config_dir = config_dir
         self.output_dir = output_dir
-        self.font = self.config_dir + "/" + FONT_FILE
+        self.font = self.config_dir + "/font/" + FONT_FILE
         # 掛け合い設定ファイルの読み込み
         with open(self.config_dir + "/talk_system.txt", "r", encoding="utf-8") as f:
             self.explanation_system = f.read()
@@ -40,7 +42,7 @@ class Explanation:
         for i, talk in enumerate(talks):
             print(f"({i+1}/{len(talks)})...")
             image = ic.compose(talk).save(f"output/page_{i}.png")
-            mc.add(f"output/page_{i}.png", f"output/{i}.mp3")
+            mc.add(f"output/page_{i}.png", f"output/speech_{i}.mp3")
         print("output movie file...")
         mc.save("output/output.mp4")
     
@@ -60,9 +62,9 @@ class Explanation:
     def _generate_speech(self, talks):
         for i, talk in enumerate(talks):
           print(f"({i+1}/{len(talks)})...")
-          talker = "alloy" if talk[0] == "A" else "nova"
+          talker = PERSON_A_TALKER if talk[0] == "A" else PERSON_B_TALKER
           response = self.api.generate_speech(talker, talk[1])
-          self.api.save_binary(response, self.output_dir + f"/{i}.mp3")
+          self.api.save_binary(response, self.output_dir + f"/speech_{i}.mp3")
 
     # 画像の生成
     def _generate_image(self, text, filename):
