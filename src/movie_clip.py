@@ -1,4 +1,4 @@
-from moviepy.editor import ImageClip, AudioFileClip, concatenate_videoclips
+from moviepy.editor import ImageClip, AudioFileClip, AudioClip, concatenate_videoclips
 
 class MovieClip:
   def __init__(self):
@@ -7,7 +7,8 @@ class MovieClip:
   def add(self, image_file, speech_file):
     audio = AudioFileClip(speech_file)
     image = ImageClip(image_file, duration=audio.duration+1.5)
-    clip = image.set_audio(audio)
+    # 後ろの0.15秒を切り捨ててるのは AudioFileClip でノイズが入るため、その対処療法
+    clip = image.set_audio(audio.subclip(0, -0.15))
     self.clips.append(clip)
   
   def save(self, output_file):

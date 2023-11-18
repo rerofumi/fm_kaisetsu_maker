@@ -10,6 +10,8 @@
 
 [![出力サンプル動画](http://img.youtube.com/vi/3dwVO4v5III/0.jpg)](http://www.youtube.com/watch?v=3dwVO4v5III "出力サンプル動画")
 
+OpenAI API の Speech TTS を使わず、ローカルで起動している VOICEVOX を利用するオプションを追加しました。
+
 以下の手順に従って環境をセットアップし、プロジェクトを開始してください。
 
 ## 環境のセットアップ
@@ -86,6 +88,7 @@ python kaisetsu_maker.py "解説して欲しい事柄について"
 - `-h, --help`: スクリプトのヘルプ情報を表示します。
 - `-i, --image-only`: 画像生成のみ行い解説動画部分をスキップします
 - `-k, --keep-image`: 画像生成をスキップして output ディレクトリ内にある既存画像を使用します
+- `-v, --use-voicevox`: テキスト音声に OpenAI を使用せずローカルで起動している VOICOVOX engine を使用します
 
 これらのオプションは、コマンドラインから以下のように使用できます。
 
@@ -98,6 +101,21 @@ python kaisetsu_maker.py -i "解説して欲しい事柄について"
 ## 動画のカスタマイズ
 
 resource ディレクトリ内にある txt ファイルが各種生成プロンプトになります、書き換えることで異なったテイストになります。
+
+### VOICEVOX の話者指定方法
+
+resource ディレクトリ内にある `voicevox_speaker_id.txt' ファイルが話者の指定になります。
+
+```
+A:58
+B:55
+```
+
+数字は speaker id を示しており、speaker id は VOICEVOX API の `/speakers` で確認することができます。
+
+```
+% curl http://localhost:50021/speakers
+```
 
 ## 同梱フォントについて
 
