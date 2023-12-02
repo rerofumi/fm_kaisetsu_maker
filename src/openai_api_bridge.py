@@ -2,6 +2,10 @@ from openai import OpenAI
 import requests
 from PIL import Image
 from io import BytesIO
+import time
+
+MAX_RETRY_COUNTS = 5
+
 
 # OpenAI API Bridge
 # OpenAP API を呼び出すためのブリッジクラス、コンストラクタでAPIキーを設定する
@@ -34,13 +38,24 @@ class OpenAIAPIBridge:
 
   # Dall-E での画像生成メソッド
   def generate_image(self, prompts):
-    response = self.client.images.generate(
-      model="dall-e-3",
-      prompt=prompts,
-      size="1024x1024",
-      quality="standard",
-      n=1,
-    )
+    for i in range(MAX_RETRY_COUNTS):
+      try:
+        response = self.client.images.generate(
+          model="dall-e-3",
+          prompt=prompts,
+          size="1024x1024",
+          quality="standard",
+          n=1,
+        )
+        # If the request is successful, break the loop
+        break
+      except Exception as e:
+        print(f"An error occurred: {e}")
+        if i < MAX_RETRY_COUNTS - 1:  # i is zero indexed
+          time.sleep(1)  # wait for 1 second before retrying
+        else:
+          print("Max retries exceeded. Please try again later.")
+          raise
     return response
 
   # TTS での音声生成メソッド

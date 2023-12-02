@@ -39,7 +39,7 @@ class Explanation:
                 line = f.readline()
 
 
-    def generate(self, question, image_only=False, keep_image=False):
+    def generate(self, question, image_only=False, keep_image=False, make_slide_image=False):
         # 画像の生成
         if not keep_image:
             print("generate background image files...")
@@ -48,19 +48,28 @@ class Explanation:
             self._generate_image(self.image_text_a, PERSON_A_IMAGE)
             print("generate person B image files...")
             self._generate_image(self.image_text_b, PERSON_B_IMAGE)
-        # 解説動画の生成
-        if not image_only:
+        # 掛け合いシナリオの生成
+        if (image_only and make_slide_image) or (not image_only):
             print("generate talk scenario...")
             talks = self._generate_talks(question)
+        # スライド用画像の生成
+        if make_slide_image:
+            print("generate slide image files...")
+            for i, talk in enumerate(talks):
+                print(f"({i+1}/{len(talks)})...")
+                if talk[0] == "A":
+                    self._generate_slide_image(question, talks, i)
+        # 解説動画の生成
+        if not image_only:
             print("generate speech files...")
-            self._generate_speech(talks)
-            #
+            self._generate_speech(talks)            
             print("generate pages...")
             ic = ImageComposer(BG_IMAGE, PERSON_A_IMAGE, PERSON_B_IMAGE, self.font)
             mc = MovieClip()
             for i, talk in enumerate(talks):
                 print(f"({i+1}/{len(talks)})...")
-                image = ic.compose(talk).save(f"output/page_{i}.png")
+                ic.set_slide(f"slide_{i}.png")
+                ic.compose(talk).save(f"output/page_{i}.png")
                 mc.add(f"output/page_{i}.png", f"output/speech_{i}.mp3")
             print("output movie file...")
             mc.save("output/kaisetsu_movie.mp4")
@@ -97,3 +106,7 @@ class Explanation:
     def _generate_image(self, text, filename):
         response = self.api.generate_image(text)
         self.api.save_image(self.api.download_image_from_url(self.api.extract_image_url_from_dall_e_response(response)), self.output_dir + "/" + filename)
+
+    # スライド用画像の生成
+    def _generate_slide_image(self, question, talks, step=0):
+        self._generate_image(talks[step][1], f"slide_{step}.png")

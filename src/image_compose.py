@@ -1,3 +1,4 @@
+import os
 import textwrap
 from PIL import Image, ImageDraw, ImageFont
 
@@ -7,7 +8,14 @@ class ImageComposer:
     self.p_a_file = Image.open("output/"+p_a_file).convert('RGBA')
     self.p_b_file = Image.open("output/"+p_b_file).convert('RGBA')
     self.font = ImageFont.truetype(font, 42)
+    self.slide = None
   
+  def set_slide(self, slide):
+    # slide で示された画像ファイルが存在するか確認
+    # あれば slide をセット
+    if os.path.isfile("output/"+slide):
+      self.slide = Image.open("output/"+slide).convert('RGBA')
+
   def compose(self, talk):
     if talk[0] == "A":
       return self._compose_image(talk[1], "A")
@@ -19,6 +27,9 @@ class ImageComposer:
     screen.paste(self.bg_file.resize((1920,1920)), (0, -420))
     box = Image.new("RGBA", screen.size)
     draw = ImageDraw.Draw(box, "RGBA")
+    # slide
+    if self.slide is not None:
+      screen.paste(self.slide.resize((800,800)), (560, 20))  
     # textbox
     draw.rectangle([(20, 700), (1900, 1040)], fill=(0, 0, 0, 180))
     # text

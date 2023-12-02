@@ -12,7 +12,9 @@ def main():
     print(f"Question: {args.question}")
     print(f"Image Only: {args.image_only}")
     print(f"Keep Image: {args.keep_image}")
-    generator.generate(args.question, args.image_only, args.keep_image)
+    print(f"Use VOICEVOX: {args.use_voicevox}")
+    print(f"Make Slide Image: {args.make_slide_image}")
+    generator.generate(args.question, args.image_only, args.keep_image, args.make_slide_image)
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,6 +22,7 @@ def parse_args():
     parser.add_argument("--image-only", "-i", action="store_true", required=False, help="Perform only image output, do not generate video.")
     parser.add_argument("--keep-image", "-k", action="store_true", required=False, help="Do not generate images.")
     parser.add_argument("--use-voicevox", "-v", action="store_true", required=False, help="Use VOICEVOX engine.")
+    parser.add_argument("--make-slide-image", "-s", action="store_true", required=False, help="Generate slide images.")
     return parser.parse_args()
 
 if __name__ == '__main__':

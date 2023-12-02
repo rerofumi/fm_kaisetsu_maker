@@ -13,7 +13,7 @@ def generate_speech(text, speaker_id, output_path):
   params={
     "speaker": speaker_id,
     "text": text,
-    "speedScale": 1.0,
+    "speedScale": 1.2,
     "pitchScale": 1.0,
     "intonationScale": 1.0,
     "volumeScale": 1.0,
