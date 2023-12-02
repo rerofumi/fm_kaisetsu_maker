@@ -89,6 +89,7 @@ python kaisetsu_maker.py "解説して欲しい事柄について"
 - `-i, --image-only`: 画像生成のみ行い解説動画部分をスキップします
 - `-k, --keep-image`: 画像生成をスキップして output ディレクトリ内にある既存画像を使用します
 - `-v, --use-voicevox`: テキスト音声に OpenAI を使用せずローカルで起動している VOICOVOX engine を使用します
+- `-s, --make-slide-image`: 解説に沿ったイメージ画像を画像生成して付与します
 
 これらのオプションは、コマンドラインから以下のように使用できます。
 
