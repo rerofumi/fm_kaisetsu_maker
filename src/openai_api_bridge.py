@@ -38,25 +38,25 @@ class OpenAIAPIBridge:
 
   # Dall-E での画像生成メソッド
   def generate_image(self, prompts):
-    for i in range(MAX_RETRY_COUNTS):
-      try:
         response = self.client.images.generate(
-          model="dall-e-3",
+            model="dall-e-3",
+            prompt=prompts,
+            size="1024x1024",
+            quality="standard",
+            n=1,
+        )
+        return response
+
+  # Dall-E2 での画像生成メソッド
+  def generate_image_lite(self, prompts):
+      response = self.client.images.generate(
+          model="dall-e-2",
           prompt=prompts,
-          size="1024x1024",
+          size="512x512",
           quality="standard",
           n=1,
-        )
-        # If the request is successful, break the loop
-        break
-      except Exception as e:
-        print(f"An error occurred: {e}")
-        if i < MAX_RETRY_COUNTS - 1:  # i is zero indexed
-          time.sleep(1)  # wait for 1 second before retrying
-        else:
-          print("Max retries exceeded. Please try again later.")
-          raise
-    return response
+      )
+      return response
 
   # TTS での音声生成メソッド
   def generate_speech(self, talker, prompts):

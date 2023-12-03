@@ -1,3 +1,4 @@
+import time
 from .image_compose import ImageComposer
 from .movie_clip import MovieClip
 from .voicevox_bridge import generate_speech
@@ -9,6 +10,9 @@ FONT_FILE = "NotoSansJP-Medium.ttf"
 PERSON_A_TALKER = "alloy"
 PERSON_B_TALKER = "nova"
 
+MAX_RETRY_COUNTS = 5
+
+
 class Explanation:
     def __init__(self, api, config_dir, output_dir, use_voicevox=False):
         self.api = api
@@ -18,6 +22,7 @@ class Explanation:
         self.use_voicevox = use_voicevox
         self.speaker_id_a = 2
         self.speaker_id_b = 3
+        self.access_time = time.time()
         # 掛け合い設定ファイルの読み込み
         with open(self.config_dir + "/talk_system.txt", "r", encoding="utf-8") as f:
             self.explanation_system = f.read()
@@ -103,10 +108,37 @@ class Explanation:
                 self.api.save_binary(response, self.output_dir + f"/speech_{i}.mp3")
 
     # 画像の生成
-    def _generate_image(self, text, filename):
-        response = self.api.generate_image(text)
-        self.api.save_image(self.api.download_image_from_url(self.api.extract_image_url_from_dall_e_response(response)), self.output_dir + "/" + filename)
+    def _generate_image(self, text, filename, lite=False):
+        for i in range(MAX_RETRY_COUNTS):
+            try:
+                if lite:
+                    response = self.api.generate_image_lite(text)
+                else:
+                    response = self.api.generate_image(text)
+                break
+            except Exception as e:
+                print(str(e) + f" (retrying... {i+1}/{MAX_RETRY_COUNTS})")
+                if i < MAX_RETRY_COUNTS - 1:  # i is zero indexed
+                    interval = time.time() - self.access_time
+                    if interval < 12:
+                        time.sleep(12.5 - interval)
+                    self.access_time = time.time()
+                else:
+                    print("Max retries exceeded. Change to safe image.")
+                    safe_image = "A peaceful landscape depicting a serene lake surrounded by lush green trees under a clear blue sky. There are colorful flowers blooming along the lakes edge, and a small wooden boat is gently floating on the calm water. In the background, there are rolling hills and a bright sun shining in the sky, casting a warm glow over the entire scene. This image is tranquil and idyllic, showcasing the beauty of nature without any human elements or specific cultural references."
+                    response = self.api.generate_image_lite(safe_image)
+                    break
+        self.api.save_image(self.api.download_image_from_url(
+            self.api.extract_image_url_from_dall_e_response(response)), self.output_dir + "/" + filename)
+        self.access_time = time.time()
 
     # スライド用画像の生成
     def _generate_slide_image(self, question, talks, step=0):
-        self._generate_image(talks[step][1], f"slide_{step}.png")
+        # 1分間に 6 回までしか API を呼べないので、間を空ける
+        interval = time.time() - self.access_time
+        if interval < 12:
+            time.sleep(12.5 - interval)
+        self.access_time = time.time()
+        # 画像生成
+        self._generate_image(talks[step][1], f"slide_{step}.png", False)
+
